@@ -1,42 +1,31 @@
-                                                                                     
+"""
+HackTheBox library
+"""
 import os
 import subprocess
+from formatting import sentence_case, green, bold_green, red, yellow, ascii_art
+from bad_format_exception import BadFormatException   
 
-
-class BadFormatException(Exception):
-        pass
-
-def sentence_case(string: str) -> str:
-        """
-        Return a string with its first character in Uppercase and the rest in lowercase
-        """
-        if len(string) > 1:
-                return f"{string[0].upper()}{string[1:].lower()}"
-        elif len(string) == 1:
-                return string[0].upper()
-        return ""
 
 
 def welcome(user: str, name: str, nmap: bool = False) -> str:
         """
         Return a banner welcome message
         """
-        welcome_msg = ""
-        second_line = f"Building scaffolding for HackTheBox's '{sentence_case(name)}' box.\n"
-        try:
+   
+        if ascii_art:
                 import pyfiglet
-                from termcolor import colored
-                import colorama
-                colorama.init()
-
-                result = pyfiglet.figlet_format("HTB.py", font = "larry3d")
-                welcome_msg += colored(result, 'green')
-                welcome_msg += f"Welcome {colored(user,'green', attrs=['bold'])}!\n"
         
-        except ModuleNotFoundError:
-                welcome_msg += f"Welcome {user}!\n"
-        finally:
-                welcome_msg += second_line
+        welcome_msg = ""
+        box_name = sentence_case(name)
+        
+        second_line = f"Building scaffolding for HackTheBox's '{green(box_name)}' box.\n"
+        
+        if ascii_art:
+                result = pyfiglet.figlet_format("HTB.py", font = "larry3d")
+                welcome_msg += green(result)
+        welcome_msg += f"Welcome {bold_green(user)}!\n"
+        welcome_msg += second_line
         
         if nmap:
                 welcome_msg += "Nmap scan option selected. This may take while.\n"
@@ -70,9 +59,9 @@ def add_box_to_etc_hosts(name: str, ip: str) -> None:
                         for etc_hosts_hostname in etc_hosts_hostnames:
                                 hostnames.append(etc_hosts_hostname.lower())
                 if name.lower() in hostnames or f"{name}.htb".lower() in hostnames:                                                                    
-                        print(f"Hostname {name} already found in /etc/hosts. Skipping.")                                                              
+                        print(f"Hostname '{name}' already found in /etc/hosts. {yellow('Skipping')}.")                                                              
                 elif ip in ips:
-                        print(f"Ip address {ip} already found in /etc/hosts. Skipping.")                                                              
+                        print(f"Ip address '{ip}' already found in /etc/hosts. {yellow('Skipping')}.")                                                              
                 else:
                         ipv4_lines.append(f"{ip}\t{name.lower()}.htb\n")
                         with open('/etc/hosts', 'w') as g:
@@ -85,7 +74,7 @@ def run_nmap(path: str, ip: str) -> None:
         """
         nmap_cmd = ['nmap', '-sC', '-sV', '-oN', 'nmap/nmap', ip]
         nmap_string = " ".join(nmap_cmd)
-        print(f"Running {nmap_string}...")
+        print(f"Running '{green(nmap_string)}''...")
         try:
                 os.makedirs(f"{path}/nmap")
                 os.chdir(path)
@@ -94,10 +83,11 @@ def run_nmap(path: str, ip: str) -> None:
                         for line in io.stdout:
                                 print(line.decode('utf8').strip())
                                 h.write(line.decode('utf8'))
-                        for line in io.stderr:
-                                print(line.decode('utf8').strip())
+                        if io.stderr:
+                                for line in io.stderr:
+                                        print(line.decode('utf8').strip())
         except FileExistsError:
-                print(f"Directory: {path}/nmap already exists. Skipping nmap run.")
+                print(f"Directory: '{path}/nmap' already exists. {yellow('Skipping nmap run')}.")
 
 def massage_ip(ip: str) -> str:
         """
@@ -108,7 +98,7 @@ def massage_ip(ip: str) -> str:
                 return f"10.10.10.{ip}"
         return ip 
 
-def make_scaffolding(path: str) -> None:
+def make_scaffolding(path: str, colors: bool = False) -> None:
         """
         Create directory at <path> if not exists
         """
@@ -116,7 +106,7 @@ def make_scaffolding(path: str) -> None:
                 os.makedirs(path)
                 print(f"Creating directory: {path}...")
         except FileExistsError:
-                print(f"Directory: {path} already exists. Skipping.")
+                print(f"Directory: '{path}'' already exists. {yellow('Skipping')}.")
 
 
 def create_write_up(path: str, name: str) -> None:
