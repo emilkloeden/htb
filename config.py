@@ -6,8 +6,8 @@ colors = False
 colored = lambda x, y, attrs=None: x
 
 def set_colors():
-        nonlocal colors
-        nonlocal colored
+        global colors
+        global colored
         
         try:
                 import termcolor
@@ -23,7 +23,7 @@ def set_colors():
 
 
 def set_ascii_art():
-        nonlocal ascii_art
+        global ascii_art
         
         try:
             import pyfiglet
