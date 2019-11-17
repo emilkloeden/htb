@@ -18,24 +18,27 @@ import htb
 import getpass
 import os
 from docopt import docopt
+from formatting import red, green, yellow
+from bad_format_exception import BadFormatException
 
 def main():
         arguments = docopt(__doc__)
-        print(arguments)
         ip = arguments['<ip>']
         name = arguments['<name>']    
         nmap = arguments['--nmap']
-        path = arguments['--path'] if arguments['--path'] else os.getcwd()
-        path += f"/{name}"
+        base_path = arguments['--path'] if arguments['--path'] else os.getcwd()
+        path = f"{base_path}/{name}"
         ip = htb.massage_ip(ip)
+        
+
 
         user = getpass.getuser()
         print(htb.welcome(user=user, name=name, nmap=nmap))  
 
         try:
                 htb.add_box_to_etc_hosts(name=name, ip=ip)
-        except htb.BadFormatException as e:
-                print(e)
+        except BadFormatException as e:
+                print(red(e))
                 exit()
         
         htb.make_scaffolding(path=path)
@@ -43,9 +46,9 @@ def main():
         if nmap:
                 htb.run_nmap(path=path, ip=ip)
 
-        print("Creating writeup.md...")
+        print(f"Creating {path}/{green('writeup.md')}...")
         htb.create_write_up(path=path, name=name)
-        print("Creating notes.py...")
+        print(f"Creating {path}/{green('notes.py')}...")
         htb.create_notes(path=path)
 
 if __name__ == '__main__':                                      
