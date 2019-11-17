@@ -18,7 +18,6 @@ import htb
 import getpass
 import os
 from docopt import docopt
-import formatting
 from formatting import red, green, yellow
 from bad_format_exception import BadFormatException
 
@@ -30,7 +29,6 @@ def main():
         base_path = arguments['--path'] if arguments['--path'] else os.getcwd()
         path = f"{base_path}/{name}"
         ip = htb.massage_ip(ip)
-        formatting.init()
         
 
 

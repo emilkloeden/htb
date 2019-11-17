@@ -1,31 +1,9 @@
-ascii_art = False
-colors = False
-colored = lambda x, y, attrs=None: x
+"""
+Formatting helper functions
+"""
 
-def init():
-        __set_ascii_art()
-        __set_colors()
+from config import ascii_art, colors, colored
 
-def __set_colors():
-        global colors
-        global colored
-        
-        try:
-                from termcolor import colored
-                import colorama
-                colorama.init()
-                colors = True
-        except ModuleNotFoundError:
-                colors = False
-
-def __set_ascii_art():
-        global ascii_art
-        
-        try:
-            import pyfiglet
-            ascii_art = True
-        except ModuleNotFoundError:
-            ascii_art = False
 
 def sentence_case(string: str) -> str:
         """
